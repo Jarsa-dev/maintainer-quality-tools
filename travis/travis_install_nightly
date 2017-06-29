@@ -59,8 +59,12 @@ else
     echo "Using Odoo from cache ${REPO_CACHED}"
     chown `(whoami)`:`(id -gn)` -R ${REPO_CACHED}
     ln -sf ${REPO_CACHED}/odoo ${ODOO_PATH}
-    cd ${ODOO_PATH} \
-        && git fetch --depth=1 ${REMOTE} ${BRANCH} \
+    cd ${ODOO_PATH}
+    git ls-remote --exit-code ${REMOTE}
+    if test $? != 0; then
+        git remote add ${REMOTE} https://github.com/${REMOTE}/${REPO_NAME}.git
+    fi
+    git fetch --depth=1 ${REMOTE} ${BRANCH} \
         && git config --local --bool core.bare false \
         && git checkout -b ${BRANCH}-${REMOTE} -qf ${REMOTE}/${BRANCH}
 fi
